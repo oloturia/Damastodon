@@ -28,21 +28,21 @@ def check_message(notification):
 		content = content[len(botname):]
 		saves = os.listdir(save_position)
 		if content.lower() == "help":
-			mastodon.status_post("Hello @"+account+",\nchallenge an user by writing to me\nCHALL <USERNAME>\nEx. \"CHALL @someone@mastdn.inst.wxyz\"\nThe challenger takes WHITE and begins the match.\nFor movements and jumps, write the coords separated by spaces.\nEx. \"A4 B5\" (normal movement) or \"A4 C6 D8\" (double jump)\nQUIT ends the match.\nCommands are NOT case sensitive..",visibility="direct")
+			mastodon.status_post("Hello @"+account+" \nchallenge an user by writing to me\nCHALL <USERNAME>\nEx. \"CHALL @someone@mastdn.inst.wxyz\"\nThe challenger takes WHITE and begins the match.\nFor movements and jumps, write the coords separated by spaces.\nEx. \"A4 B5\" (normal movement) or \"A4 C6 D8\" (double jump)\nQUIT ends the match.\nCommands are NOT case sensitive..",visibility="direct")
 			return
 		if not os.path.exists(save_position+account):
 			if content[:5].lower() == "sfida":
 				file_save_white = [sv for sv in saves if account in sv]
 				file_save_black = [sv for sv in saves if content[:6] in sv]
 				if len(file_save_white) > 0:
-					mastodon.status_post("Hello @"+account+",\n you're already playing a match")
+					mastodon.status_post("Hello @"+account+" \n you're already playing a match")
 					return
 				elif len(file_save_black):
-					mastodon.status_post("Hello @"+content[7:]+",\n is already playing a match")
+					mastodon.status_post("Hello @"+content[7:]+" \n is already playing a match")
 					return
 				else:
 					open(save_position+account,"w").close()
-					ident = mastodon.status_post("Hello @"+content[7:]+",\n@"+account+" challenged you to a match of draughts! Anzwer \n@"+account+" OK\n to accept the chellenge or \n@"+account+" NO\n to cancel.",visibility="direct")
+					ident = mastodon.status_post("Hello @"+content[7:]+" \n@"+account+" challenged you to a match of draughts! Answer \n@"+account+" OK\n to accept the chellenge or \n@"+account+" NO\n to cancel.",visibility="direct")
 					return
 			elif content.split(" ")[1].lower() == "ok":
 				os.symlink(content.split(" ")[0][1:],save_position+account)
@@ -59,7 +59,7 @@ def check_message(notification):
 				mastodon.status_post(account+" you cancelled the challenge from "+content.split(" ")[0],visibility="direct")
 				return
 			else:
-				mastodon.status_post("Hello @"+account+" I can't understand your commend or you're not in a match.\nWrite HELP to see the list of available commands.",visibility="direct")
+				mastodon.status_post("Hello @"+account+" \nI can't understand your commend or you're not in a match.\nWrite HELP to see the list of available commands.",visibility="direct")
 				return
 		else:
 			with open(save_position+account,"rb") as f:
@@ -75,7 +75,7 @@ def check_message(notification):
 			if (black == "@"+account and turn == 1) or (white == "@"+account and turn == 0):
 				board = dama.valid_move(content.lower(),turn,board)
 				if board == -1:
-					mastodon.status_post("@"+account+"\nInvalid move.",visibility="direct")
+					mastodon.status_post("@"+account+" \nInvalid move.",visibility="direct")
 					return
 				else:
 					with open(save_position+account,"wb") as f:
@@ -102,7 +102,7 @@ def check_message(notification):
 						mastodon.status_post("◾: "+black+" ◽: "+white+"\n"+winner_t+" WINS!\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 \n"),visibility="direct")
 						return
 			else:
-				mastodon.status_post("@"+account+"\nIt's not your turn.",visibility="direct")
+				mastodon.status_post("@"+account+" \nIt's not your turn.",visibility="direct")
 				return		
 
 if __name__ == "__main__":
