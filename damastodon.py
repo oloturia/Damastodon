@@ -11,7 +11,7 @@ import re
 import sys
 
 api_url = sys.argv[1]
-save_position = "/tmp"
+save_position = "/tmp/"
 CLEANR = re.compile('<.*?>')
 botname = "@damastodon "
 
