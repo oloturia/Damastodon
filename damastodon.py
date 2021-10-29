@@ -31,7 +31,7 @@ def check_message(notification):
 			mastodon.status_post("Hello @"+account+" \nchallenge an user by writing to me\nCHALL <USERNAME>\nEx. \"CHALL @someone@mastdn.inst.wxyz\"\nThe challenger takes WHITE and begins the match.\nFor movements and jumps, write the coords separated by spaces.\nEx. \"A4 B5\" (normal movement) or \"A4 C6 D8\" (double jump)\nQUIT ends the match.\nCommands are NOT case sensitive..",visibility="direct")
 			return
 		if not os.path.exists(save_position+account):
-			if content[:5].lower() == "sfida":
+			if content[:5].lower() == "chall":
 				file_save_white = [sv for sv in saves if account in sv]
 				file_save_black = [sv for sv in saves if content[:6] in sv]
 				if len(file_save_white) > 0:
