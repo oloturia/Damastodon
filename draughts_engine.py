@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import re
+
 def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",frstrow=" abcdefgh\n"):
 	bstr = ""
 	bstr += frstrow
@@ -46,10 +48,13 @@ def row_column_translation(row,col):
 		return row,cols.index(ord(col))
 
 def valid_move(pos_toParse,turn,board):
-	pos = pos_toParse.split(" ") #tricky part, pos[0] is the starting cell, pos[1] to pos[n] the destination point(s), for every coord, [x][0] is the column (the letter) and [x][1] the row (the number)
-	for rowcol in pos:
-		if (rowcol[0] not in ("a","b","c","d","e","f","g","h")) or (rowcol[1] not in ("1","2","3","4","5","6","7","8")): #check if the positions are valid
-			return -1
+	#pos = pos_toParse.split(" ") #tricky part, pos[0] is the starting cell, pos[1] to pos[n] the destination point(s), for every coord, [x][0] is the column (the letter) and [x][1] the row (the number)
+	pos = re.findall("\\b[abcdefgh][12345678]\\b",pos_toParse)
+	#for rowcol in pos:
+	#	if (rowcol[0] not in ("a","b","c","d","e","f","g","h")) or (rowcol[1] not in ("1","2","3","4","5","6","7","8")): #check if the positions are valid
+	#		return -1
+	if len(pos) < 2:
+		return -1
 	row_start,col_start = row_column_translation(pos[0][1],pos[0][0])
 	if(row_start == -1):
 		return -1
