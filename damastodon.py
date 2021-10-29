@@ -13,6 +13,7 @@ import sys
 api_url = sys.argv[1]
 save_position = "/tmp"
 CLEANR = re.compile('<.*?>')
+botname = "@damastodon "
 
 def cleanHTML(raw):
 	cleanText = re.sub(CLEANR, '',raw)
@@ -20,9 +21,12 @@ def cleanHTML(raw):
 
 def check_message(notification):
 		account = notification["account"]["acct"]
-		content = cleanHTML(notification["status"]["content"])[6:]
+		try:
+			content = cleanHTML(notification["status"]["content"])
+		except KeyError:
+			return
+		content = content[len(botname):]
 		saves = os.listdir(save_position)
-		#print(content) #DEBUG only
 		if content.lower() == "help":
 			mastodon.status_post("Hello @"+account+",\nchallenge an user by writing to me\nCHALL <USERNAME>\nEx. \"CHALL @someone@mastdn.inst.wxyz\"\nThe challenger takes WHITE and begins the match.\nFor movements and jumps, write the coords separated by spaces.\nEx. \"A4 B5\" (normal movement) or \"A4 C6 D8\" (double jump)\nQUIT ends the match.\nCommands are NOT case sensitive..",visibility="direct")
 			return
