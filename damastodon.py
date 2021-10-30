@@ -62,7 +62,7 @@ def check_message(notification):
 					pickle.dump("@"+challenger,f)
 					pickle.dump(False,f)
 					pickle.dump(board,f)
-				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" turn ◽\n"+dama.draw_checkerboard(board,space="🟥",white_norm="◽",white_knight="⚪",black_norm="◾",black_knight="⚫",empty="🟦",frstrow="0 🇦  🇧  🇨  🇩  🇪  🇫  🇬  🇭 \n"),visibility="direct")
+				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" turn ◽\n"+dama.draw_checkerboard(board,space="🟥",white_norm="◽",white_knight="⚪",black_norm="◾",black_knight="⚫",empty="🟦",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭\n"),visibility="direct")
 				return
 			elif content.split(" ")[1].lower() == "no":
 				os.remove(save_position+content.split(" ")[0][1:])
