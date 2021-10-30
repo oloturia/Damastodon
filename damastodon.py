@@ -15,6 +15,9 @@ save_position = "/tmp/"
 CLEANR = re.compile('<.*?>')
 botname = "@damastodon "
 
+firow = "🔠1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣\n"
+colsx = "🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 "
+
 def cleanHTML(raw):
 	cleanText = re.sub(CLEANR, '',raw)
 	return cleanText
@@ -62,7 +65,11 @@ def check_message(notification):
 					pickle.dump("@"+challenger,f)
 					pickle.dump(False,f)
 					pickle.dump(board,f)
+<<<<<<< HEAD
 				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" turn ◽\n"+dama.draw_checkerboard(board,space="🟥",white_norm="◽",white_knight="⚪",black_norm="◾",black_knight="⚫",empty="🟦",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭\n"),visibility="direct")
+=======
+				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" turn ◽\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow=firow, column=colsx),visibility="direct")
+>>>>>>> reversecheckboard
 				return
 			elif content.split(" ")[1].lower() == "no":
 				os.remove(save_position+content.split(" ")[0][1:])
@@ -83,7 +90,7 @@ def check_message(notification):
 				mastodon.status_post(black+" "+white+" the match was cancelled.")
 				return
 			if (black == "@"+account and turn == 1) or (white == "@"+account and turn == 0):
-				board = dama.valid_move(content.lower(),turn,board)
+				board = dama.valid_move(content.lower(),turn,board,inversion=True)
 				if board == -1:
 					mastodon.status_post("@"+account+" \nInvalid move.",visibility="direct")
 					return
@@ -100,7 +107,11 @@ def check_message(notification):
 						colour = "◾"
 					winner = dama.checkWin(board)
 					if winner == (False,False):
+<<<<<<< HEAD
 						mastodon.status_post("◾: "+black+" ◽: "+white+" turn "+colour+"\n"+dama.draw_checkerboard(board,space="🟥",white_norm="◽",white_knight="⚪",black_norm="◾",black_knight="⚫",empty="🟦",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 \n"),visibility="direct")
+=======
+						mastodon.status_post("◾: "+black+" ◽: "+white+" turn "+colour+"\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow=firow, column=colsx),visibility="direct")
+>>>>>>> reversecheckboard
 						return
 					else:
 						if winner == (True,False):
