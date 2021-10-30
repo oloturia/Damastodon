@@ -56,7 +56,7 @@ def check_message(notification):
 				try:
 					challenger = notification["status"]["mentions"][1]["acct"]
 				except:
-					mastodon.status_post("Hello @"+account+" \n your request is not valid")
+					mastodon.status_post("Hello @"+account+" \n your request is not valid",visibility="direct")
 					return
 				os.symlink(save_position+challenger,save_position+account)
 				board = dama.init_board()
@@ -83,7 +83,7 @@ def check_message(notification):
 			if content.lower() == "quit":
 				os.remove(save_position+black[1:])
 				os.remove(save_position+white[1:])
-				mastodon.status_post(black+" "+white+" the match was cancelled.")
+				mastodon.status_post(black+" "+white+" the match was cancelled.",visibility="direct")
 				return
 			if (black == "@"+account and turn == 1) or (white == "@"+account and turn == 0):
 				board = dama.valid_move(content.lower(),turn,board,inversion=True)
