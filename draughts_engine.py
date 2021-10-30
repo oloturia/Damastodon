@@ -2,12 +2,11 @@
 
 import re
 
-def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",frstrow=" abcdefgh\n"):
+def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",frstrow=" abcdefgh\n",column="12345678"):
 	bstr = ""
 	bstr += frstrow
 	for row in range(0,len(status)):
-		bstr += str(row+1)+""
-		
+		bstr += column[row]		
 		if row % 2 == 0:
 			bstr += space 
 		for cell in range(0,int(len(status)/2)):
