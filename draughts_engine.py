@@ -2,12 +2,14 @@
 
 import re
 
-def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",frstrow=" abcdefgh\n"):
+def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",column="12345678",frstrow=" abcdefgh\n"):
+	""" Draw a checkerboard, status is the virtual representation of the board, as a bi-dimensional array, white/black norm/knight are the representation of the pieces
+	space is a non-walkable cell, empty is a walkable cell, column contains labels for the left column, frstrow the labels for the first row.
+	"""
 	bstr = ""
 	bstr += frstrow
 	for row in range(0,len(status)):
-		bstr += str(row+1)+""
-		
+		bstr += column[row]		
 		if row % 2 == 0:
 			bstr += space 
 		for cell in range(0,int(len(status)/2)):
@@ -23,13 +25,14 @@ def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_n
 				bstr += empty
 			if (cell < 3):
 				bstr += space
-		if row % 2 !=0:
+		if row % 2 !=0: #odd lines ends with space and a line feed, even ones just with the line feed
 			bstr += space+"\n"
 		else:
 			bstr += "\n"
 	return bstr
 		
 def position_resolver(pos,board):
+	"""Checks if the position is valid and wether it contains a piece or not"""
 	row,col = row_column_translation(pos[1],pos[0])
 	if (col == -1):
 		return -1
@@ -37,6 +40,8 @@ def position_resolver(pos,board):
 		return board[row][col]
 
 def row_column_translation(row,col):
+	"""Converts a coordinate made by a letter/number couple in the index usable with the array that represents the board"""
+
 	row = int(row) - 1
 	if row % 2 != 0:
 		cols = range(ord("a"),ord("a")+7,2)
@@ -47,13 +52,27 @@ def row_column_translation(row,col):
 	else:
 		return row,cols.index(ord(col))
 
-def valid_move(pos_toParse,turn,board):
+def traslate_coord(pos):
+	for en,p in enumerate(pos):
+		temp_col = chr( (int(pos[en][1])-1)+ord("a") )
+		temp_row = ord(pos[en][0])-ord("a")
+		pos[en] = temp_col
+		pos[en] += str(temp_row +1)
+	return pos
+
+def valid_move(pos_toParse,turn,board,inversion=False):
+	"""Checks if the move is valid, execute it and returns the updated board"""
 	#pos = pos_toParse.split(" ") #tricky part, pos[0] is the starting cell, pos[1] to pos[n] the destination point(s), for every coord, [x][0] is the column (the letter) and [x][1] the row (the number)
-	pos = re.findall("\\b[abcdefgh][12345678]\\b",pos_toParse)
-	#for rowcol in pos:
-	#	if (rowcol[0] not in ("a","b","c","d","e","f","g","h")) or (rowcol[1] not in ("1","2","3","4","5","6","7","8")): #check if the positions are valid
-	#		return -1
-	if len(pos) < 2:
+	pos = re.findall("\\b[abcdefgh][12345678]\\b",pos_toParse)	#both row-col and col-row are accepted
+	if len(pos) == 0:											
+		pos = re.findall("\\b[12345678][abcdefgh]\\b",pos_toParse)
+		for en,x in enumerate(pos):
+			pos[en] = x[1]+x[0]
+	
+	if inversion:
+		pos = traslate_coord(pos)
+	
+	if len(pos) < 2: #less than 2 coords were given, movement is invalid
 		return -1
 	row_start,col_start = row_column_translation(pos[0][1],pos[0][0])
 	if(row_start == -1):
@@ -79,7 +98,7 @@ def valid_move(pos_toParse,turn,board):
 				start_cell = 3
 			board[row][col] = start_cell
 			return board
-		else:
+		else: #destination cell is not empty
 			return -1
 	else:
 		for x in range(0,len(pos) -1):
@@ -106,9 +125,9 @@ def valid_move(pos_toParse,turn,board):
 						if ((row == 7) and start_cell == 1):
 							start_cell = 3
 						pos.pop(0) #if there are other moves this check loops
-					else:
+					else: #one of the pieces moves are invalid
 						return -1
-				else:
+				else: #destination not empty
 					return -1
 			else:
 				return -1
@@ -136,18 +155,29 @@ def checkWin(board):
 	return (white_won,black_won)
 
 def main():
+	import sys
+	column_i = "12345678"
+	frstrow_i = " abcdefgh\n"
+	inverted = False
+	try:
+		if sys.argv[1] == "i":
+			column_i = "abcdefgh"
+			frstrow_i = " 12345678\n"
+			inverted = True
+	except IndexError:
+		pass
 	main_board = init_board()
 	s = ""
 	turn = False
 	while (s !="q"):
-		vis_board = draw_checkerboard(main_board)
+		vis_board = draw_checkerboard(main_board,column=column_i,frstrow=frstrow_i)
 		print(vis_board)
 		if turn:
 			s = input("Black move:")
 		else:
 			s = input("White move:")
 		if (s !="q"):
-			result = valid_move(s,turn,main_board)
+			result = valid_move(s,turn,main_board,inversion=inverted)
 			if result != -1:
 				main_board = result
 				winner = checkWin(main_board)
