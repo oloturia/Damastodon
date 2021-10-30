@@ -100,7 +100,7 @@ def check_message(notification):
 						colour = "◾"
 					winner = dama.checkWin(board)
 					if winner == (False,False):
-						mastodon.status_post("◾: "+black+" ◽: "+white+" turn "+colour+"\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 \n"),visibility="direct")
+						mastodon.status_post("◾: "+black+" ◽: "+white+" turn "+colour+"\n"+dama.draw_checkerboard(board,space="🟥",white_norm="◽",white_knight="⚪",black_norm="◾",black_knight="⚫",empty="🟦",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 \n"),visibility="direct")
 						return
 					else:
 						if winner == (True,False):
@@ -109,7 +109,7 @@ def check_message(notification):
 							winner_t = "BLACK"
 						os.remove(save_position+black[1:])
 						os.remove(save_position+white[1:])
-						mastodon.status_post("◾: "+black+" ◽: "+white+"\n"+winner_t+" WINS!\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 \n"),visibility="direct")
+						mastodon.status_post("◾: "+black+" ◽: "+white+"\n"+winner_t+" WINS!\n"+dama.draw_checkerboard(board,space="🟥",white_norm="◽",white_knight="⚪",black_norm="◾",black_knight="⚫",empty="🟦",frstrow="0🇦 🇧 🇨 🇩 🇪 🇫 🇬 🇭 \n"),visibility="direct")
 						return
 			else:
 				mastodon.status_post("@"+account+" \nIt's not your turn.",visibility="direct")
