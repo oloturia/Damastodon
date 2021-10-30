@@ -8,6 +8,7 @@ import random
 import os
 import time
 import sys
+import re
 
 api_url = sys.argv[1]
 save_position = "/tmp/"
