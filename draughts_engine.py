@@ -2,14 +2,10 @@
 
 import re
 
-<<<<<<< HEAD
-def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",frstrow=" abcdefgh\n",column="12345678"):
-=======
 def draw_checkerboard(status,space="▒",white_norm="h",white_knight="H",black_norm="b",black_knight="B",empty=" ",column="12345678",frstrow=" abcdefgh\n"):
 	""" Draw a checkerboard, status is the virtual representation of the board, as a bi-dimensional array, white/black norm/knight are the representation of the pieces
 	space is a non-walkable cell, empty is a walkable cell, column contains labels for the left column, frstrow the labels for the first row.
 	"""
->>>>>>> reversecheckboard
 	bstr = ""
 	bstr += frstrow
 	for row in range(0,len(status)):
