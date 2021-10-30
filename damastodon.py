@@ -37,16 +37,16 @@ def check_message(notification):
 			try:
 				challenged = notification["status"]["mentions"][1]["acct"]
 			except:
-				mastodon.status_post("Hello @"+account+" \n your request is not valid")
+				mastodon.status_post("Hello @"+account+" \n your request is not valid",visibility="direct")
 				return
 			if content[:5].lower() == "chall":
 				file_save_white = [sv for sv in saves if account in sv]
 				file_save_black = [sv for sv in saves if challenged in sv]
 				if len(file_save_white) > 0:
-					mastodon.status_post("Hello @"+account+" \n you're already playing a match")
+					mastodon.status_post("Hello @"+account+" \n you're already playing a match",visibility="direct")
 					return
 				elif len(file_save_black):
-					mastodon.status_post("Hello @"+account+" \n the user you challenged is already playing a match")
+					mastodon.status_post("Hello @"+account+" \n the user you challenged is already playing a match",visibility="direct")
 					return
 				else:
 					open(save_position+account,"w").close()
@@ -65,7 +65,7 @@ def check_message(notification):
 					pickle.dump("@"+challenger,f)
 					pickle.dump(False,f)
 					pickle.dump(board,f)
-				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" turn ◽\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow=firow, column=colsx),visibility="direct")
+				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" \nturn ◽\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow=firow, column=colsx),visibility="direct")
 				return
 			elif content.split(" ")[1].lower() == "no":
 				os.remove(save_position+content.split(" ")[0][1:])
@@ -103,7 +103,7 @@ def check_message(notification):
 						colour = "◾"
 					winner = dama.checkWin(board)
 					if winner == (False,False):
-						mastodon.status_post("◾: "+black+" ◽: "+white+" turn "+colour+"\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow=firow, column=colsx),visibility="direct")
+						mastodon.status_post("◾: "+black+" ◽: "+white+" \nturn "+colour+"\n"+dama.draw_checkerboard(board,space="🟥 ",white_norm="◽ ",white_knight="⚪ ",black_norm="◾ ",black_knight="⚫ ",empty="🟦 ",frstrow=firow, column=colsx),visibility="direct")
 						return
 					else:
 						if winner == (True,False):
