@@ -15,7 +15,7 @@ save_position = "/tmp/"
 CLEANR = re.compile('<.*?>')
 botname = "@damastodon "
 
-firow = " 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣\n"
+firow = "🇻1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣\n"
 colsx = "🇦🇧🇨🇩🇪🇫🇬🇭"
 
 def cleanHTML(raw):
