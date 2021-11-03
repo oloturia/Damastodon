@@ -105,7 +105,8 @@ def check_message(notification):
 				try:
 					start = pickle.load(f)
 				except EOFError: # Something went very wrong, file is corrupt?
-					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has moved or corrupted
+					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has been moved or is corrupted
+					os.remove(save_position+account)
 					print(account+" file corrupted")
 					return
 				if start: #The game is started, load other parameters
