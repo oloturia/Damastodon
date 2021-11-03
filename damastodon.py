@@ -73,6 +73,7 @@ def check_message(notification):
 						start = pickle.load(f)
 				except FileNotFoundError:
 					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has moved or corrupted
+					print(account+" file not found")
 					return
 				if start != "WAIT":
 					mastodon.status_post("Hello @"+account+" \n your request is not valid",visibility="direct") #The user that challenged us is playing a game with someone else
@@ -101,7 +102,12 @@ def check_message(notification):
 				return
 		else: #We are in a game, so movements are parsed and lobby commands are disabled
 			with open(save_position+account,"rb") as f:
-				start = pickle.load(f)
+				try:
+					start = pickle.load(f)
+				except EOFError: # Something went very wrong, file is corrupt?
+					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has moved or corrupted
+					print(account+" file corrupted")
+					return
 				if start: #The game is started, load other parameters
 					black = pickle.load(f)
 					white = pickle.load(f)
@@ -155,7 +161,7 @@ def check_message(notification):
 
 if __name__ == "__main__":
 	if api_url[:4] != "http":
-		print("Invalid address.")
+		print("Invalid address")
 		quit()
 	mastodon = login.login(api_url)
 	while True:
