@@ -9,6 +9,7 @@ import os
 import time
 import sys
 import re
+import logging
 
 #configuration server
 api_url = sys.argv[1]
@@ -26,6 +27,8 @@ black_norm="◾ "
 black_knight="⚫ "
 empty="🟦 "
 
+#logging config
+logging.basicConfig(filename="/tmp/dama.log",encoding="utf-8",level=logging.DEBUG)
 
 def cleanHTML(raw):
 	cleanText = re.sub(CLEANR, '',raw)
@@ -73,7 +76,7 @@ def check_message(notification):
 						start = pickle.load(f)
 				except FileNotFoundError:
 					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has moved or corrupted
-					print(account+" file not found")
+					logging.warning("%s file not found",account)
 					return
 				if start != "WAIT":
 					mastodon.status_post("Hello @"+account+" \n your request is not valid",visibility="direct") #The user that challenged us is playing a game with someone else
@@ -107,7 +110,7 @@ def check_message(notification):
 				except EOFError: # Something went very wrong, file is corrupt?
 					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has been moved or is corrupted
 					os.remove(save_position+account)
-					print(account+" file corrupted")
+					logging.warning("%s file corrupted",account)
 					return
 				if start: #The game is started, load other parameters
 					black = pickle.load(f)
@@ -162,7 +165,7 @@ def check_message(notification):
 
 if __name__ == "__main__":
 	if api_url[:4] != "http":
-		print("Invalid address")
+		logging.error("Invalid address")
 		quit()
 	mastodon = login.login(api_url)
 	while True:
