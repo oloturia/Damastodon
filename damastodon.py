@@ -75,8 +75,13 @@ def check_message(notification):
 				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" \nturn ◽\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
 				return
 			elif content.split(" ")[1].lower() == "no":
-				os.remove(save_position+content.split(" ")[0][1:])
-				mastodon.status_post(account+" you cancelled the challenge from "+content.split(" ")[0],visibility="direct")
+				try:
+					challenger = notification["status"]["mentions"][1]["acct"]
+				except:
+					mastodon.status_post("Hello @"+account+" \n your request is not valid",visibility="direct")
+					return
+				os.remove(save_position+challenger)
+				mastodon.status_post(account+" you cancelled the challenge from "+challenger,visibility="direct")
 				return
 			else:
 				mastodon.status_post("Hello @"+account+" \nI can't understand your command or you're not in a match.\nWrite HELP to see the list of available commands.",visibility="direct")
