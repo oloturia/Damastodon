@@ -1,8 +1,12 @@
 from mastodon import Mastodon
+import os
+
+fileDir = os.path.dirname(os.path.abspath(__file__))
+fileDir = fileDir +"/"
 
 def login(url):
 	mastodon = Mastodon(
-		access_token = "DAMA.SECRET",
+		access_token = fileDir+"DAMA.SECRET",
 		api_base_url = url
 	)	
 	return mastodon
