@@ -28,7 +28,7 @@ black_knight="⚫ "
 empty="🟦 "
 
 #logging config
-logging.basicConfig(filename="/tmp/dama.log",encoding="utf-8",level=logging.DEBUG)
+logging.basicConfig(filename="/tmp/dama.log",level=logging.DEBUG)
 
 def cleanHTML(raw):
 	cleanText = re.sub(CLEANR, '',raw)
