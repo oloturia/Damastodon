@@ -39,35 +39,27 @@ def dropChip(board,move_str,player):
 	return board, checkFour(board,free_space,move)
 
 def checkFour(board,row,col):
-	offset_pairs = ( ((0,1),(0,-1)) , ((1,0),(-1,0)) , ((1,1),(-1,-1)) , ((-1,1),(1,-1)) )
-	points = 0
-	for offset in offset_pairs:
-		count = 0
-		count += checkSide(board,row,col,offset[0])
-		count += checkSide(board,row,col,offset[1])
-		if count >= 4:
-			points += 1
-	return points
-	
-			
-def checkSide(board,row,col,incs):
-	incY,incX = incs
-	count = 0
+	sumOr = lambda a,b : (a[0]+b[0], a[1]+b[1])
+	orients = { "N":(1,0),"S":(-1,0),"E":(0,1),"W":(0,-1) }
 	player = board[row][col]
-	offsetX = 0
-	offsetY = 0
-	while count < 4:
-		try:
-			if board[row+offsetX][col+offsetY] == player:
-				count += 1
-				offsetX += incX
-				offsetY += incY
-			else:
-				break
-		except IndexError:
-			break
-	return count
-		
+	offX = 0
+	offY = 0
+	#TODO
+	
+	
+	return points
+
+def checkPly(board,row,col,player):
+	if row < 0 or col < 0:
+		return False
+	try:
+		if board[row][col] == player:
+			return True
+		else:
+			return False
+	except IndexError:
+		return False
+
 
 if __name__ == "__main__":
 	board = initChequerboard()
@@ -77,6 +69,8 @@ if __name__ == "__main__":
 	points_2 = 0
 	while match:
 		drawChequerboard(board)
+		print("Player 1:"+str(points_1))
+		print("Player 2:"+str(points_2))
 		move = input("Player "+str(player)+" turn:")
 		if move == "q":
 			print("quitting")
@@ -102,7 +96,7 @@ if __name__ == "__main__":
 	print("Player 2 scored "+str(points_2)+" points")
 	if points_1 > points_2:
 		print("Player 1 won!")
-	elif points_2 > points_2:
+	elif points_2 > points_1:
 		print("Player 2 won!")
 	else:
 		print("Draw!")
