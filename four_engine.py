@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
-def drawChequerboard(status,players=[],toprow="1234567"):
+def drawChequerboard(status,players=[],space="░",toprow="1234567"):
 	print(toprow)
 	for row in status:
 		for cell in row:
 			if cell == 0:
-				print("░",end="")
+				print(space,end="")
 			else:
 				try:
 					print(players[cell],end="")
@@ -42,12 +42,44 @@ def checkFour(board,row,col):
 	sumOr = lambda a,b : (a[0]+b[0], a[1]+b[1])
 	orients = { "N":(1,0),"S":(-1,0),"E":(0,1),"W":(0,-1) }
 	player = board[row][col]
-	offX = 0
-	offY = 0
-	#TODO
-	
+	points = 0
+	count = 0
+	count += countTokens(board,orients["N"],row,col)
+	count += countTokens(board,orients["S"],row,col)
+	if count >= 3:
+		points +=1
+	count = 0
+	count += countTokens(board,orients["E"],row,col)
+	count += countTokens(board,orients["W"],row,col)
+	if count >= 3:
+		points +=1
+	count = 0
+	count += countTokens(board,sumOr( orients["N"],orients["E"] ),row,col )
+	count += countTokens(board,sumOr( orients["S"],orients["W"] ),row,col )
+	if count >= 3:
+		points +=1
+	count = 0
+	count += countTokens(board,sumOr( orients["N"],orients["W"] ),row,col )
+	count += countTokens(board,sumOr( orients["S"],orients["E"] ),row,col )
+	if count >= 3:
+		points +=1
+
 	
 	return points
+
+def countTokens(board,check,row,col):
+	player = board[row][col]
+	offX = check[0]
+	offY = check[1]
+	count = 0
+	while True:
+		if row+offY < 0 or row+offY >= len(board[row])-1 or col+offX < 0 or col+offX > len(board) or  (board[row+offY][col+offX] != player) :
+			break
+		else:
+			count += 1
+			offX += check[0]
+			offY += check[1]
+	return count
 
 def checkPly(board,row,col,player):
 	if row < 0 or col < 0:
@@ -92,6 +124,7 @@ if __name__ == "__main__":
 				if cell == 0:
 					match = True
 	print("Match over")
+	drawChequerboard(board)
 	print("Player 1 scored "+str(points_1)+" points")
 	print("Player 2 scored "+str(points_2)+" points")
 	if points_1 > points_2:

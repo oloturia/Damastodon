@@ -1,5 +1,9 @@
 TOKEN
+TOKEN.LOCAL
+TOKEN.OLD
 DAMA.SECRET
+DAMA.SECRET.LOCAL
+DAMA.SECRET.OLD
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
