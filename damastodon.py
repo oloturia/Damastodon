@@ -82,7 +82,7 @@ def lobby(notification,content,account,extension):
 			
 			if extension == "draughts": #Draughts init
 				board = dama.init_board()
-				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" \nturn ◽\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
+				mastodon.status_post("◾: @"+account+" \n◽: @"+challenger+" \nturn ◽\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
 			elif extension == "conn4": #Conn4 init
 				board = four_engine.initChequerboard()
 				mastodon.status_post("⚪: @"+account+" \n⚫: @"+challenger+" \nturn ⚪\n"+four_engine.drawChequerboard(board,players=[white_knight,black_knight],space=empty,toprow=conn4row),visibility="direct")			
@@ -185,7 +185,7 @@ def check_message(notification):
 		
 		#Draughts
 		if os.path.exists(save_position+account+".draughts"): #We are in a game, so movements are parsed and lobby commands are disabled
-			start,black,white,turn,board = load_status(account,"conn4")
+			start,black,white,turn,board = load_status(account,"draughts",content)
 			if not(start):
 				return
 
@@ -209,7 +209,7 @@ def check_message(notification):
 						colour = "◾"
 					winner = dama.checkWin(board) #Check for winner
 					if winner == (False,False): #No one is winning yet
-						mastodon.status_post("◾: "+black+" ◽: "+white+" \nturn "+colour+"\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
+						mastodon.status_post("◾: "+black+" \n◽: "+white+" \nturn "+colour+"\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
 						return
 					else: #Someone won
 						if winner == (True,False):
@@ -218,7 +218,7 @@ def check_message(notification):
 							winner_t = "BLACK"
 						os.remove(save_position+black[1:]+".draughts")
 						os.remove(save_position+white[1:]+".draughts")
-						mastodon.status_post("◾: "+black+" ◽: "+white+"\n"+winner_t+" WINS!\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
+						mastodon.status_post("◾: "+black+" \n◽: "+white+"\n"+winner_t+" WINS!\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
 						return
 			else: #We moved in a wrong turn
 				mastodon.status_post("@"+account+" \nIt's not your turn.",visibility="direct")
