@@ -1,17 +1,20 @@
 #!/usr/bin/python3
 
 def drawChequerboard(status,players=[],space="░",toprow="1234567"):
-	print(toprow)
+	bstr = ""
+	bstr += toprow+"\n"
 	for row in status:
 		for cell in row:
 			if cell == 0:
-				print(space,end="")
+				bstr += space
 			else:
 				try:
-					print(players[cell],end="")
+					bstr += players[cell-1]
 				except IndexError:
-					print(str(cell),end="")
-		print(" ")
+					bstr += str(cell)
+				
+		bstr += "\n"
+	return bstr
 	
 def initChequerboard(cols=7,rows=6):
 	board = list()
@@ -25,7 +28,7 @@ def dropChip(board,move_str,player):
 		move = int(move_str)-1
 	except ValueError:
 		return failure
-	if move < 0 or move > 6:
+	if move < 0 or move >= len(board[0]):
 		return failure
 	free_space = -1
 	for row in board:
@@ -100,7 +103,8 @@ if __name__ == "__main__":
 	points_1 = 0
 	points_2 = 0
 	while match:
-		drawChequerboard(board)
+		print( drawChequerboard(board) )
+		
 		print("Player 1:"+str(points_1))
 		print("Player 2:"+str(points_2))
 		move = input("Player "+str(player)+" turn:")
@@ -124,7 +128,7 @@ if __name__ == "__main__":
 				if cell == 0:
 					match = True
 	print("Match over")
-	drawChequerboard(board)
+	print( drawChequerboard(board) )
 	print("Player 1 scored "+str(points_1)+" points")
 	print("Player 2 scored "+str(points_2)+" points")
 	if points_1 > points_2:

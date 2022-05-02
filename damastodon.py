@@ -32,7 +32,7 @@ black_knight="⚫ "
 empty="🟦 "
 
 #conn4
-conn4row = "🇻1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣\n"
+conn4row = "1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣\n"
 
 #logging config
 logging.basicConfig(filename="/tmp/dama.log",level=logging.DEBUG)
@@ -59,7 +59,7 @@ def lobby(notification,content,account,extension):
 			else:
 				with open(save_position+account+"."+extension,"wb") as f: #The request is valid, writes a savegame with the first element as False, that marks that the game isn't started yet
 					pickle.dump("WAIT",f)
-				ident = mastodon.status_post("Hello @"+challenged+" \n@"+account+" challenged you to a match of "+extension+"! Answer \n @"+account+" OK "+extension.upper()+"\n to accept the challenge or \n@"+account+" NO "+extension.upper()+"\n to cancel.",visibility="direct")
+				ident = mastodon.status_post("Hello @"+challenged+" \n@"+account+" challenged you to a match of "+extension+"! Reply \n @"+account+" OK "+extension.upper()+"\n to accept the challenge or \n@"+account+" NO "+extension.upper()+"\n to cancel.",visibility="direct")
 				return
 		elif content.split(" ")[1].lower() == "ok" and content.split(" ")[2].lower() == extension: #The opponent accepted the match
 			try:
@@ -85,8 +85,8 @@ def lobby(notification,content,account,extension):
 				mastodon.status_post("◾: @"+account+" ◽: @"+challenger+" \nturn ◽\n"+dama.draw_checkerboard(board,space,white_norm,white_knight,black_norm,black_knight,empty,column,frstrow),visibility="direct")
 			elif extension == "conn4": #Conn4 init
 				board = four_engine.initChequerboard()
-				mastodon.status_post(four_engine.drawChequerboard(board,players=[white_knight,black_knight],space=empty,toprow=conn4row),visibility="direct")
-			with open(save_position+account+"."+extension,"wb") as f:
+				mastodon.status_post("⚪: @"+account+" \n⚫: @"+challenger+" \nturn ⚪\n"+four_engine.drawChequerboard(board,players=[white_knight,black_knight],space=empty,toprow=conn4row),visibility="direct")			
+			with open(save_position+account+"."+extension,"wb") as f: #Writing the file with the status of the game
 				pickle.dump("START",f) #Now the game has started
 				pickle.dump("@"+account,f)
 				pickle.dump("@"+challenger,f)
@@ -106,6 +106,36 @@ def lobby(notification,content,account,extension):
 			mastodon.status_post("Hello @"+account+" \nI can't understand your command or you're not in a match.\nWrite HELP to see the list of available commands.",visibility="direct") #Every other command for the lobby ends here
 			return
 
+def load_status(account,extension,content):
+	with open(save_position+account+"."+extension,"rb") as f: #Open the status file - extension is the type of the game
+		try:
+			start = pickle.load(f)
+		except EOFError: #Something wrong happened
+			mastodon.status_post("Hello @"+account+" \n unfortunately your savegame is corrupted or missing. The game is cancelled.",visibility="direct")
+			os.remove(save_position+account+"."+extension)
+			logging.warning("% file corrupted or missing",account+"."+extension)
+			return False
+
+		player_1 = pickle.load(f) #Read status from file
+		player_2 = pickle.load(f)
+		turn = pickle.load(f)
+		board = pickle.load(f)
+
+		if (start == "WAIT"): #The game is not started yet
+			if "quit" in content.lower(): #Game withdrawn
+				os.remove(save_position+account+"."+extension)
+				mastodon.status_post("Hello @"+account+" \nthe challenge has been withdrawn.",visibility="direct")
+			else: #Lobby is disabled if a challenge request is active
+				mastodon.status_post("Hello @"+account+" \nyou have already challenged someone, type QUIT to withdraw,",visibility="direct")
+				return False
+			if "quit" in content.lower(): #The game is quitted
+				os.remove(save_position+player_1[1:]+"."+extension)
+				os.remove(save_position+player_2[1:]+"."+extension)
+				mastodon.status_post(player_2+" "+player_1+" the match was cancelled.",visibility="direct")
+				return False
+
+		return True,player_1,player_2,turn,board
+
 def check_message(notification):
 		account = notification["account"]["acct"]
 		try:
@@ -113,40 +143,53 @@ def check_message(notification):
 		except KeyError:
 			return
 		content = content[len(botname):]
-		#saves = os.listdir(save_position)
 		if "help" in content.lower(): #Ask for help
 			mastodon.status_post("Hello @"+account+" \nchallenge an user in a game of draughts by writing to me\nDRAUGHTS <USERNAME>\nEx. \"DRAUGHTS @someone@mastdn.inst.wxyz\"\nThe challenger takes WHITE and begins the match.\nFor movements and jumps, write the coords separated by spaces.\nEx. \"A4 B5\" (normal movement) or \"A4 C6 D8\" (double jump)\nQUIT ends the match.\nCommands are NOT case sensitive.\nTo challenge someone in a game of Connect 4 write CONN4 <USERNAME>.",visibility="direct")
 			return
 		
 
+		#Conn4
+		if os.path.exists(save_position+account+".conn4"):
+			start,player_1,player_2,turn,board = load_status(account,"conn4",content)
+			if not(start):
+				return
+			
+			if (player_2 == "@"+account and turn == 1) or (player_1 == "@"+account and turn == 0):
+				board,win = four_engine.dropChip(board,content.lower()[-1],turn+1)
+				if not(board): 
+					mastodon.status_post("@"+account+" \nInvalid move.",visibility="direct")
+					return
+				else:
+					with open(save_position+account+".conn4","wb") as f:
+						pickle.dump("START",f)
+						turn = not turn
+						pickle.dump(player_1,f)
+						pickle.dump(player_2,f)
+						pickle.dump(turn,f)
+						pickle.dump(board,f)
+					if turn == 0: #the first is the current turn, the second is the last turn
+						colour = (white_knight,black_knight)
+					else:
+						colour = (black_knight,white_knight)
+					if win == 0:
+						mastodon.status_post("⚪: "+player_1+" \n⚫: "+player_2+" \nturn "+colour[0]+"\n"+four_engine.drawChequerboard(board,players=[white_knight,black_knight],space=empty,toprow=conn4row),visibility="direct")			
+						return
+					else: #Someone won!
+						mastodon.status_post("⚪: "+player_1+" \n⚫: "+player_2+" \n"+colour[1]+" WINS!\n"+four_engine.drawChequerboard(board,players=[white_knight,black_knight],space=empty,toprow=conn4row),visibility="direct")			
+						os.remove(save_position+player_1[1:]+".conn4")
+						os.remove(save_position+player_2[1:]+".conn4")
+						return
+			else: #We moved in a wrong turn
+				mastodon.status_post("@"+account+" \nIt's not your turn.",visibility="direct")
+				return					
 		
 		#Draughts
 		if os.path.exists(save_position+account+".draughts"): #We are in a game, so movements are parsed and lobby commands are disabled
-			with open(save_position+account+".draughts","rb") as f:
-				try:
-					start = pickle.load(f)
-				except EOFError: # Something went very wrong, file is corrupt?
-					mastodon.status_post("Hello @"+account+" \n unfortunately, your savegame is corrupted or missing",visibility="direct") #The file has been moved or is corrupted
-					os.remove(save_position+account+".draughts")
-					logging.warning("%s file corrupted",account)
-					return
-				if start: #The game is started, load other parameters
-					black = pickle.load(f)
-					white = pickle.load(f)
-					turn = pickle.load(f)
-					board = pickle.load(f)
-			if (start == "WAIT"): #The game is not started yet
-				if "quit" in content.lower(): #Game withdrawn
-					os.remove(save_position+account+".draughts")
-					mastodon.status_post("Hello @"+account+" \nthe challenge has been withdrawn.",visibility="direct")
-				else: #Lobby is disabled if a challenge request is active
-					mastodon.status_post("Hello @"+account+" \nyou have already challenged someone, type QUIT to withdraw,",visibility="direct")
+			start,black,white,turn,board = load_status(account,"conn4")
+			if not(start):
 				return
-			if "quit" in content.lower(): #The game is quitted
-				os.remove(save_position+black[1:]+".draughts")
-				os.remove(save_position+white[1:]+".draughts")
-				mastodon.status_post(black+" "+white+" the match was cancelled.",visibility="direct")
-				return
+
+
 			if (black == "@"+account and turn == 1) or (white == "@"+account and turn == 0): #Check if the turn is right
 				board = dama.valid_move(content.lower(),turn,board,inversion=True) #Function dama.valid_move parses the input for couples of letter and number
 				if board == -1: #We made an invalid move
