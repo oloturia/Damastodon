@@ -6,7 +6,7 @@ fileDir = fileDir +"/"
 
 def login(url):
 	mastodon = Mastodon(
-		access_token = fileDir+"DAMA.SECRET.LOCAL",
+		access_token = fileDir+"DAMA.SECRET",
 		api_base_url = url
 	)	
 	return mastodon
